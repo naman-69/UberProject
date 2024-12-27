@@ -1,3 +1,4 @@
+const blacklistTokenModels = require("../models/blacklistToken.models.js");
 const userModel = require("../models/user.models.js");
 
 module.exports.registerUser = async (req,res,next)=>{
@@ -85,9 +86,37 @@ module.exports.LoginUser = async (req,res,next)=>{
 
     const token = userfound.generateAuthtoken();
 
+    res.cookie('token',token);
+
     return res.status(200).json({
         token,
         userfound,
         message:"User LoggedIn successfuly"
+    });
+}
+
+
+module.exports.userProfile = async (req,res,next)=>{
+    return res.status(200).json(req.user);
+}
+
+
+module.exports.logoutUser = async (req,res,next)=>{
+    
+    res.clearCookie('token');
+
+    const token = req.cookies?.token || (req.headers.authorization?.split(' ')[1] || null);
+
+    if (!token) {
+        return res.status(401).json({ message: 'Authentication token is missing.' });
+    }
+
+
+    await blacklistTokenModels.create({
+        token
+    });
+    
+    return res.status(200).json({
+        message:"Logged Out successfully"
     });
 }
