@@ -1,6 +1,8 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React,{useContext} from 'react'
+import { Link , useNavigate } from 'react-router-dom'
 import { useState } from 'react';
+import axios from 'axios';
+import { userDataContext } from '../context/userContext';
 
 const UserSignup = () => {
 
@@ -8,20 +10,33 @@ const UserSignup = () => {
   const [password, setpassword] = useState("");
   const [firstname, setfirstname] = useState("");
   const [lastname, setlastname] = useState("");
-  const [userData, setuserData] = useState({})
 
-  const submitHandler=(e)=>{
+  const navigate = useNavigate();
+
+  const {user,setUser} = useContext(userDataContext);
+
+  const submitHandler= async(e)=>{
     e.preventDefault();
-    setuserData({
+
+    const newUser = {
       fullname:{
-        firstName:firstname,
-        lastName:lastname
+        firstname:firstname,
+        lastname:lastname
       },
       email:email,
       password:password
-    });
+    }; 
 
-    console.log("UserData is:",userData);
+    const url = `${import.meta.env.VITE_BASE_URL}/users/register`;
+    console.log('URL:', url); // Ensure it logs the correct URL
+    const response = await axios.post(url, newUser);
+    console.log("response is:",response);
+    if(response.status==201){
+      const data = response.data;
+      setUser(data.userCreated)
+      localStorage.setItem('token', data.token );
+      navigate('/home')
+    }
 
     setemail("");
     setfirstname("");
@@ -53,7 +68,7 @@ const UserSignup = () => {
                 <input type="password" placeholder='password' required className='bg-[#eeeeee] mb-6 rounded px-4 py-2 border w-full text-base placeholder:text-sm' value={password} onChange={(e)=>{
                     setpassword(e.target.value)
                   }}/>
-                <button className='bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-base placeholder:text-sm'>Login</button>
+                <button className='bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2 w-full text-base placeholder:text-sm'>Create Account</button>
             </form>
             <p className='text-center'>Already have a Account?<Link to="/login" className='text-blue-600'>Login here</Link></p>
         </div>

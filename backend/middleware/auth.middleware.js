@@ -9,7 +9,7 @@ module.exports.authUser = async(req,res,next)=>{
     if(!token){
         return res.status(401).json({message:"Unautrized access"});
     }
-
+    console.log("token is:",token);
     const blacklisted = await blacklistTokenModels.findOne(
         {
             token:token

@@ -15,8 +15,8 @@ module.exports.registerUser = async (req,res,next)=>{
         )
     }
 
-    const isUserPresent = await userModel.find({email});
-
+    const isUserPresent = await userModel.findOne({email});
+    console.log("isUserPresent",isUserPresent);
     if(isUserPresent){
         return res.status(400).json(
             {
@@ -115,7 +115,9 @@ module.exports.logoutUser = async (req,res,next)=>{
     
     res.clearCookie('token');
 
-    const token = req.cookies?.token || (req.headers.authorization?.split(' ')[1] || null);
+    const token = req.cookies?.token || (req.headers.authrization?.split(' ')[1] || null);
+
+    console.log("token in c:",token);
 
     if (!token) {
         return res.status(401).json({ message: 'Authentication token is missing.' });
